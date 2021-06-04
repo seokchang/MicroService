@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.metabuild.microservice.common.ErrorsResource;
 import com.metabuild.microservice.dao.ProductRepository;
+import com.metabuild.microservice.message.ProductMsgProducer;
 import com.metabuild.microservice.product.Product;
 
 @RestController
@@ -30,6 +31,9 @@ public class ProductController {
 
 	@Autowired
 	private ProductRepository productRepository;
+
+	@Autowired
+	ProductMsgProducer msgProducer;
 
 	// Product 1개 조회
 	@GetMapping("/{id}")
@@ -107,6 +111,7 @@ public class ProductController {
 		Product existingProduct = optionalProduct.get();
 
 		productRepository.delete(existingProduct);
+		msgProducer.sendUpdate(existingProduct, true);
 
 		return ResponseEntity.ok(existingProduct);
 	}
